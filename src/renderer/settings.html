@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>OptiRest — Settings</title>
+    <link rel="stylesheet" href="settings.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Settings</h1>
+
+        <!-- Break Configuration -->
+        <div class="settings-group">
+            <h2>Break Configuration</h2>
+
+            <div class="setting-item">
+                <label>Break interval</label>
+                <div class="slider-row">
+                    <input type="range" id="breakIntervalSlider" min="5" max="60" step="5">
+                    <span class="slider-value"><span id="breakIntervalVal">20</span> min</span>
+                </div>
+                <input type="hidden" id="breakInterval">
+            </div>
+
+            <div class="setting-item">
+                <label>Break duration</label>
+                <div class="slider-row">
+                    <input type="range" id="breakDurationSlider" min="10" max="60" step="5">
+                    <span class="slider-value"><span id="breakDurationVal">20</span> sec</span>
+                </div>
+                <input type="hidden" id="breakDuration">
+            </div>
+
+            <div class="setting-item">
+                <label>Postpone duration</label>
+                <div class="slider-row">
+                    <input type="range" id="postponeDurationSlider" min="1" max="30" step="1">
+                    <span class="slider-value"><span id="postponeDurationVal">5</span> min</span>
+                </div>
+                <input type="hidden" id="postponeDuration">
+            </div>
+        </div>
+
+        <!-- Preferences -->
+        <div class="settings-group">
+            <h2>Preferences</h2>
+            <div class="setting-item checkbox">
+                <input type="checkbox" id="soundEnabled">
+                <label for="soundEnabled">Enable completion sound</label>
+            </div>
+            <div class="setting-item checkbox">
+                <input type="checkbox" id="autoStart">
+                <label for="autoStart">Start automatically at login</label>
+            </div>
+            <div class="setting-item">
+                <label for="reminderMessage">Custom reminder message</label>
+                <input type="text" id="reminderMessage" placeholder="Leave blank to use exercise rotation">
+            </div>
+        </div>
+
+        <!-- Working Hours -->
+        <div class="settings-group">
+            <h2>Working Hours</h2>
+            <p class="group-hint">Only remind during these hours</p>
+            <div class="setting-item checkbox">
+                <input type="checkbox" id="workingHoursEnabled">
+                <label for="workingHoursEnabled">Enable working hours</label>
+            </div>
+            <div class="setting-item working-hours-range" id="workingHoursFields">
+                <label>Active between</label>
+                <div class="time-row">
+                    <input type="time" id="workingHoursStart" value="09:00">
+                    <span class="time-sep">and</span>
+                    <input type="time" id="workingHoursEnd" value="18:00">
+                </div>
+            </div>
+        </div>
+
+        <!-- Background Customisation -->
+        <div class="settings-group">
+            <h2>Break Background</h2>
+            <p class="group-hint">Choose what shows during your eye break</p>
+
+            <div class="bg-mode-tabs" id="bgModeTabs">
+                <button class="tab-btn active" data-mode="default">Default</button>
+                <button class="tab-btn" data-mode="gradient">Gradient</button>
+                <button class="tab-btn" data-mode="images">Images</button>
+            </div>
+            <input type="hidden" id="backgroundMode" value="default">
+
+            <!-- Gradient panel -->
+            <div class="bg-panel" id="panelGradient" style="display:none">
+                <div class="gradient-row">
+                    <div class="color-field">
+                        <label>Start color</label>
+                        <input type="color" id="gradientStart" value="#0a0e27">
+                    </div>
+                    <div class="color-field">
+                        <label>End color</label>
+                        <input type="color" id="gradientEnd" value="#0d2137">
+                    </div>
+                    <div class="color-field angle-field">
+                        <label>Angle</label>
+                        <div class="slider-row">
+                            <input type="range" id="gradientAngleSlider" min="0" max="360" step="15">
+                            <span class="slider-value"><span id="gradientAngleVal">135</span>°</span>
+                        </div>
+                        <input type="hidden" id="gradientAngle">
+                    </div>
+                </div>
+                <div class="gradient-preview" id="gradientPreview"></div>
+            </div>
+
+            <!-- Images panel -->
+            <div class="bg-panel" id="panelImages" style="display:none">
+                <div class="images-toolbar">
+                    <button class="upload-btn" id="uploadImagesBtn">+ Add Images <span class="count-badge" id="imgCount">0/5</span></button>
+                    <input type="file" id="imageFileInput" accept="image/png,image/jpeg,image/gif,image/webp" multiple style="display:none">
+                </div>
+                <div class="image-grid" id="imageGrid"></div>
+                <p class="group-hint" style="margin-top:8px">Up to 5 images. They rotate each break.</p>
+            </div>
+        </div>
+
+        <div class="button-group">
+            <button id="saveBtn" class="primary">Save</button>
+            <button id="cancelBtn">Cancel</button>
+        </div>
+    </div>
+
+    <script src="settings.js"></script>
+</body>
+</html>

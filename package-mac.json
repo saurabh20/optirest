@@ -1,0 +1,41 @@
+{
+  "appId": "com.blogsaays.optirest",
+  "productName": "OptiRest",
+  "directories": {
+    "output": "dist/mac"
+  },
+  "files": [
+    "src/**/*",
+    "package.json"
+  ],
+  "mac": {
+    "category": "public.app-category.productivity",
+    "icon": "src/assets/icons/app-icon.icns",
+    "target": [
+      {
+        "target": "dmg",
+        "arch": ["arm64", "x64"]
+      },
+      {
+        "target": "zip",
+        "arch": ["arm64", "x64"]
+      }
+    ],
+    "darkModeSupport": true,
+    "hardenedRuntime": true,
+    "gatekeeperAssess": false,
+    "entitlements": "build/entitlements.mac.plist",
+    "entitlementsInherit": "build/entitlements.mac.plist"
+  },
+  "dmg": {
+    "title": "OptiRest",
+    "window": {
+      "width": 540,
+      "height": 380
+    },
+    "contents": [
+      { "x": 140, "y": 195, "type": "file" },
+      { "x": 400, "y": 195, "type": "link", "path": "/Applications" }
+    ]
+  }
+}

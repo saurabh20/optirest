@@ -1,0 +1,37 @@
+{
+  "appId": "com.blogsaays.optirest",
+  "productName": "OptiRest",
+  "directories": {
+    "output": "dist/linux"
+  },
+  "files": [
+    "src/**/*",
+    "package.json"
+  ],
+  "linux": {
+    "icon": "src/assets/icons/app-icon.png",
+    "target": [
+      {
+        "target": "AppImage",
+        "arch": ["x64", "arm64"]
+      },
+      {
+        "target": "deb",
+        "arch": ["x64"]
+      },
+     
+    ],
+    "category": "Utility",
+    "description": "Eye strain prevention app using the 20-20-20 rule",
+    "maintainer": "Saurabh Mukhekar <blogsaays@gmail.com>",
+    "vendor": "Saurabh Mukhekar",
+    "synopsis": "Protect your eyes from digital strain"
+  },
+  "deb": {
+    "priority": "optional",
+    "depends": ["libnotify4", "libappindicator1 | libayatana-appindicator1"]
+  },
+  "rpm": {
+    "depends": ["libnotify", "libappindicator"]
+  }
+}

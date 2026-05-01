@@ -1,0 +1,34 @@
+{
+  "appId": "com.blogsaays.optirest",
+  "productName": "OptiRest",
+  "directories": {
+    "output": "dist/windows"
+  },
+  "files": [
+    "src/**/*",
+    "package.json"
+  ],
+  "win": {
+    "icon": "src/assets/icons/app-icon.ico",
+    "target": [
+      {
+        "target": "nsis",
+        "arch": ["x64", "ia32"]
+      }
+    ],
+    "publisherName": "Saurabh Mukhekar",
+    "verifyUpdateCodeSignature": false
+  },
+  "nsis": {
+    "oneClick": false,
+    "perMachine": false,
+    "allowToChangeInstallationDirectory": true,
+    "installerIcon": "src/assets/icons/app-icon.ico",
+    "uninstallerIcon": "src/assets/icons/app-icon.ico",
+    "installerHeaderIcon": "src/assets/icons/app-icon.ico",
+    "createDesktopShortcut": true,
+    "createStartMenuShortcut": true,
+    "shortcutName": "OptiRest",
+    "runAfterFinish": true
+  }
+}

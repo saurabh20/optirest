@@ -1,0 +1,30 @@
+{
+  "appId": "com.blogsaays.optirest",
+  "productName": "OptiRest",
+  "directories": {
+    "output": "dist/windows-store"
+  },
+  "files": [
+    "src/**/*",
+    "package.json"
+  ],
+  "win": {
+    "icon": "src/assets/icons/app-icon.ico",
+    "target": [
+      {
+        "target": "appx",
+        "arch": ["x64"]
+      }
+    ],
+    "publisherName": "Saurabh Mukhekar",
+    "verifyUpdateCodeSignature": false
+  },
+  "appx": {
+    "applicationId": "OptiRest",
+    "backgroundColor": "#0a0e27",
+    "displayName": "OptiRest",
+    "identityName": "com.blogsaays.optirest",
+    "publisher": "CN=Saurabh Mukhekar",
+    "publisherDisplayName": "Saurabh Mukhekar"
+  }
+}

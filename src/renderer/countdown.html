@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Eye Break</title>
+    <link rel="stylesheet" href="countdown.css">
+</head>
+<body>
+    <div class="overlay">
+        <!-- Two bg layers crossfade between images without touching the content -->
+        <div class="bg-layer" id="bgLayerA"></div>
+        <div class="bg-layer" id="bgLayerB"></div>
+        <div class="content">
+            <h1 id="reminderMessage">Time to rest your eyes</h1>
+            <p class="instruction">Look at something 20 feet away</p>
+            <div class="countdown-circle">
+                <svg width="200" height="200">
+                    <circle class="progress-bg" cx="100" cy="100" r="90"/>
+                    <circle class="progress-ring" cx="100" cy="100" r="90"/>
+                </svg>
+                <span class="countdown-text">20</span>
+            </div>
+            <div class="shortcuts">
+                <p>Press <kbd>Cmd/Ctrl+Shift+P</kbd> to postpone</p>
+                <p>Press <kbd>Cmd/Ctrl+Shift+K</kbd> to skip</p>
+            </div>
+        </div>
+    </div>
+    <script src="countdown.js"></script>
+</body>
+</html>

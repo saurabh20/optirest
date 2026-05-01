@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Welcome to OptiRest</title>
+    <link rel="stylesheet" href="onboarding.css">
+</head>
+<body>
+    <div class="window">
+
+        <!-- Step 1: Welcome -->
+        <div class="step active" id="step1">
+            <div class="step-icon">👁️</div>
+            <h1>Welcome to <span class="brand">OptiRest</span></h1>
+            <p class="subtitle">Protect your eyes from digital strain.<br>Takes 20 seconds every 20 minutes.</p>
+            <div class="rule-cards">
+                <div class="rule-card">
+                    <span class="rule-num">20</span>
+                    <span class="rule-unit">min</span>
+                    <span class="rule-label">Every 20 minutes</span>
+                </div>
+                <div class="rule-card">
+                    <span class="rule-num">20</span>
+                    <span class="rule-unit">ft</span>
+                    <span class="rule-label">Look 20 feet away</span>
+                </div>
+                <div class="rule-card">
+                    <span class="rule-num">20</span>
+                    <span class="rule-unit">sec</span>
+                    <span class="rule-label">For 20 seconds</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 2: How it works -->
+        <div class="step" id="step2">
+            <div class="step-icon">⏱️</div>
+            <h1>How it works</h1>
+            <p class="subtitle">OptiRest runs quietly in your menu bar and reminds you when it's time to rest.</p>
+            <div class="how-list">
+                <div class="how-item">
+                    <span class="how-icon">🔔</span>
+                    <div>
+                        <strong>Gentle reminders</strong>
+                        <p>A full-screen overlay appears with a countdown timer and eye exercise.</p>
+                    </div>
+                </div>
+                <div class="how-item">
+                    <span class="how-icon">⏭️</span>
+                    <div>
+                        <strong>You're in control</strong>
+                        <p>Postpone or skip any break. OptiRest never locks your screen.</p>
+                    </div>
+                </div>
+                <div class="how-item">
+                    <span class="how-icon">📊</span>
+                    <div>
+                        <strong>Track your progress</strong>
+                        <p>See your compliance rate and weekly stats in the Statistics view.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 3: Set interval -->
+        <div class="step" id="step3">
+            <div class="step-icon">⚙️</div>
+            <h1>Set your break interval</h1>
+            <p class="subtitle">How often should OptiRest remind you?<br>The 20-20-20 rule recommends every 20 minutes.</p>
+            <div class="interval-picker">
+                <div class="interval-display">
+                    <span id="intervalValue">20</span>
+                    <span class="interval-unit">minutes</span>
+                </div>
+                <input type="range" id="intervalSlider" min="10" max="60" step="5" value="20">
+                <div class="interval-labels">
+                    <span>10 min</span>
+                    <span>Recommended: 20</span>
+                    <span>60 min</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 4: Auto-start -->
+        <div class="step" id="step4">
+            <div class="step-icon">🚀</div>
+            <h1>Start at login?</h1>
+            <p class="subtitle">Should OptiRest start automatically when you log in to your computer?</p>
+            <div class="choice-cards">
+                <button class="choice-card selected" id="choiceYes" data-value="yes">
+                    <span class="choice-icon">✅</span>
+                    <strong>Yes, start automatically</strong>
+                    <p>OptiRest will always be ready to protect your eyes.</p>
+                </button>
+                <button class="choice-card" id="choiceNo" data-value="no">
+                    <span class="choice-icon">🖐️</span>
+                    <strong>No, I'll start it manually</strong>
+                    <p>You control when OptiRest runs.</p>
+                </button>
+            </div>
+        </div>
+
+        <!-- Step 5: All set -->
+        <div class="step" id="step5">
+            <div class="step-icon done-icon">🎉</div>
+            <h1>You're all set!</h1>
+            <p class="subtitle">OptiRest is running in your menu bar.<br>Your first break reminder will appear in <strong id="firstBreakIn">20</strong> minutes.</p>
+            <div class="summary-box" id="summaryBox"></div>
+        </div>
+
+        <!-- Navigation -->
+        <div class="nav">
+            <div class="dots" id="dots">
+                <span class="dot active"></span>
+                <span class="dot"></span>
+                <span class="dot"></span>
+                <span class="dot"></span>
+                <span class="dot"></span>
+            </div>
+            <div class="nav-btns">
+                <button class="btn-back" id="backBtn" style="visibility:hidden">Back</button>
+                <button class="btn-next" id="nextBtn">Get Started →</button>
+            </div>
+        </div>
+
+    </div>
+    <script src="onboarding.js"></script>
+</body>
+</html>
