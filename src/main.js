@@ -867,7 +867,12 @@ class OptiRest {
         });
 
       } else {
-        // Linux: use xdotool to check active window geometry vs screen size
+        // Linux: Wayland doesn't support xdotool — skip fullscreen check
+        if (process.env.WAYLAND_DISPLAY || process.env.XDG_SESSION_TYPE === 'wayland') {
+          resolve(false);
+          return;
+        }
+        // X11: use xdotool to check active window geometry vs screen size
         exec(
           `xdotool getactivewindow getwindowgeometry --shell 2>/dev/null`,
           (err, stdout) => {
