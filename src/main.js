@@ -17,11 +17,66 @@ let countdownWindows = [];
 let tray = null;
 let breakTimer = null;
 let trayTooltipTimer = null;
+let autoConditionTimer = null;
 let nextBreakAt = null;
 let missedBreaks = 0;
 let isBreakActive = false;
 let isPaused = false;
+let autoPauseActive = false;
+let autoPauseReason = '';
 let store;
+
+// ── Auto-pause: process names that trigger pause ──────────────────────────────
+const AUTO_PAUSE_PROCESSES = {
+  meeting: [
+    'zoom', 'zoomphone', 'zoom.us',
+    'teams', 'msteams',
+    'skype', 'skypehost',
+    'webex', 'ciscowebexmeetings',
+    'slack',
+    'discord',
+    'facetime',
+    'loom',
+    'whereby',
+    'googlemeet',
+  ],
+  recording: [
+    'obs', 'obs64', 'obs-studio', 'obs studio',
+    'quicktime player',
+    'screenflow',
+    'camtasia',
+    'kap',
+    'screenium',
+    'cleanmypc', // has screen recorder
+    'bandicam',
+    'fraps',
+    'shadowplay',
+  ],
+  video: [
+    'vlc', 'vlc media player',
+    'iina',
+    'mpv',
+    'plex',
+    'infuse',
+    'elmedia player',
+    'windows media player',
+    'wmplayer',
+    'movies & tv',
+    'netflix',
+    'mplayerosx extended',
+  ],
+  gaming: [
+    'steam',
+    'epicgameslauncher',
+    'battle.net',
+    'gog galaxy',
+    'origin',
+    'ubisoft connect',
+    'minecraft',
+    'leagueclient',
+    'riotclientux',
+  ]
+};
 
 class OptiRest {
   constructor() {
@@ -68,6 +123,7 @@ class OptiRest {
     app.on('will-quit', () => {
       globalShortcut.unregisterAll();
       if (trayTooltipTimer) clearInterval(trayTooltipTimer);
+      if (autoConditionTimer) clearInterval(autoConditionTimer);
     });
     app.on('activate', () => { if (!tray) this.createTray(); });
   }
@@ -78,6 +134,7 @@ class OptiRest {
     this.startBreakTimer();
     this.setupAutoStart();
     this.startTrayTooltipUpdater();
+    this.startAutoConditionChecker();
 
     powerMonitor.on('resume', () => {
       if (!isPaused) this.startBreakTimer();
@@ -293,7 +350,7 @@ class OptiRest {
     const delay = Math.max(0, targetDate - Date.now());
 
     breakTimer = setTimeout(() => {
-      if (!isPaused && this.isWithinWorkingHours()) {
+      if (!isPaused && !autoPauseActive && this.isWithinWorkingHours()) {
         this.startBreak();
       } else {
         const retryAt = new Date(Date.now() + 60 * 1000);
@@ -322,6 +379,7 @@ class OptiRest {
 
   updateTrayTooltip() {
     if (!tray) return;
+    if (autoPauseActive) { tray.setToolTip(`${APP_NAME} — auto-paused (${autoPauseReason})`); return; }
     if (isPaused) { tray.setToolTip(`${APP_NAME} — paused`); return; }
     if (!nextBreakAt) { tray.setToolTip(APP_NAME); return; }
     const minsLeft = Math.max(0, Math.ceil((nextBreakAt - Date.now()) / 60000));
@@ -380,11 +438,13 @@ class OptiRest {
     const minsLeft = nextBreakAt
       ? Math.max(0, Math.ceil((nextBreakAt - Date.now()) / 60000))
       : null;
-    const statusLabel = isPaused
-      ? 'Status: Paused'
-      : minsLeft !== null
-        ? `Next break in ${minsLeft <= 1 ? '<1' : minsLeft}m`
-        : 'Starting…';
+    const statusLabel = autoPauseActive
+      ? `Auto-paused: ${autoPauseReason}`
+      : isPaused
+        ? 'Status: Paused'
+        : minsLeft !== null
+          ? `Next break in ${minsLeft <= 1 ? '<1' : minsLeft}m`
+          : 'Starting…';
 
     const contextMenu = Menu.buildFromTemplate([
       { label: statusLabel, enabled: false },
@@ -452,6 +512,8 @@ class OptiRest {
 
       win.once('ready-to-show', () => {
         win.show();
+        win.focus();
+        win.webContents.focus();
         win.webContents.send('start-countdown', {
           duration: settings.breakDuration,
           message: settings.reminderMessage
@@ -620,6 +682,194 @@ class OptiRest {
     } else {
       shell.beep();
     }
+  }
+
+  // ── Auto-pause: condition checker ─────────────────────────────────────────
+
+  startAutoConditionChecker() {
+    if (autoConditionTimer) clearInterval(autoConditionTimer);
+    // Run immediately then every 30s
+    this.checkAutoConditions();
+    autoConditionTimer = setInterval(() => this.checkAutoConditions(), 30 * 1000);
+  }
+
+  async checkAutoConditions() {
+    try {
+      const processes = await this.getRunningProcessNames();
+      const isFullscreen = await this.isFullscreenAppRunning();
+      const lower = processes.map(p => p.toLowerCase());
+
+      let detected = false;
+      let reason = '';
+
+      // Check meetings
+      for (const name of AUTO_PAUSE_PROCESSES.meeting) {
+        if (lower.some(p => p.includes(name))) {
+          detected = true; reason = `meeting app active (${name})`; break;
+        }
+      }
+
+      // Check recording
+      if (!detected) {
+        for (const name of AUTO_PAUSE_PROCESSES.recording) {
+          if (lower.some(p => p.includes(name))) {
+            detected = true; reason = `screen recording active (${name})`; break;
+          }
+        }
+      }
+
+      // Check video (only if fullscreen — video in window doesn't need pause)
+      if (!detected && isFullscreen) {
+        for (const name of AUTO_PAUSE_PROCESSES.video) {
+          if (lower.some(p => p.includes(name))) {
+            detected = true; reason = `fullscreen video playback (${name})`; break;
+          }
+        }
+      }
+
+      // Check gaming (fullscreen + gaming process)
+      if (!detected && isFullscreen) {
+        for (const name of AUTO_PAUSE_PROCESSES.gaming) {
+          if (lower.some(p => p.includes(name))) {
+            detected = true; reason = `gaming detected (${name})`; break;
+          }
+        }
+      }
+
+      // Fullscreen non-electron app = deep focus / unknown fullscreen app
+      if (!detected && isFullscreen) {
+        detected = true;
+        reason = 'fullscreen app detected (deep focus / presentation)';
+      }
+
+      if (detected && !autoPauseActive) {
+        // Auto-pause
+        autoPauseActive = true;
+        autoPauseReason = reason;
+        if (breakTimer) clearTimeout(breakTimer);
+        nextBreakAt = null;
+        console.log(`[AutoPause] Paused — ${reason}`);
+        this.updateTrayTooltip();
+        this.updateContextMenu();
+
+      } else if (!detected && autoPauseActive) {
+        // Auto-resume
+        autoPauseActive = false;
+        autoPauseReason = '';
+        console.log('[AutoPause] Resumed');
+        if (!isPaused) this.startBreakTimer();
+        this.updateTrayTooltip();
+        this.updateContextMenu();
+      }
+
+    } catch (e) {
+      console.error('[AutoPause] Check failed:', e.message);
+    }
+  }
+
+  getRunningProcessNames() {
+    return new Promise((resolve) => {
+      const { exec } = require('child_process');
+
+      if (process.platform === 'darwin') {
+        // Get visible app names via osascript (friendlier names than ps)
+        exec(
+          `osascript -e 'tell application "System Events" to get name of every process whose background only is false'`,
+          (err, stdout) => {
+            if (err) {
+              // Fallback to ps
+              exec('ps -ax -o comm=', (err2, stdout2) => {
+                resolve(err2 ? [] : stdout2.split('\n').filter(Boolean));
+              });
+            } else {
+              resolve(stdout.split(',').map(s => s.trim()).filter(Boolean));
+            }
+          }
+        );
+
+      } else if (process.platform === 'win32') {
+        exec(
+          'powershell -command "Get-Process | Select-Object -ExpandProperty Name"',
+          (err, stdout) => {
+            resolve(err ? [] : stdout.split('\n').map(s => s.trim()).filter(Boolean));
+          }
+        );
+
+      } else {
+        // Linux
+        exec('ps -ax -o comm=', (err, stdout) => {
+          resolve(err ? [] : stdout.split('\n').filter(Boolean));
+        });
+      }
+    });
+  }
+
+  isFullscreenAppRunning() {
+    return new Promise((resolve) => {
+      const { exec } = require('child_process');
+
+      if (process.platform === 'darwin') {
+        // Check if frontmost app is fullscreen via osascript
+        exec(
+          `osascript -e 'tell application "System Events" to get value of attribute "AXFullScreen" of window 1 of (first process whose frontmost is true)' 2>/dev/null`,
+          (err, stdout) => {
+            if (err) { resolve(false); return; }
+            const result = stdout.trim();
+            // Skip if it's our own app
+            exec(
+              `osascript -e 'tell application "System Events" to get name of (first process whose frontmost is true)'`,
+              (err2, name) => {
+                const appName = (name || '').trim().toLowerCase();
+                if (appName.includes('optirest') || appName.includes('electron')) {
+                  resolve(false);
+                } else {
+                  resolve(result === 'true');
+                }
+              }
+            );
+          }
+        );
+
+      } else if (process.platform === 'win32') {
+        // Check foreground window covers entire primary display
+        const script = `
+          Add-Type @"
+          using System;using System.Runtime.InteropServices;
+          public class Win32 {
+            [DllImport("user32.dll")] public static extern IntPtr GetForegroundWindow();
+            [DllImport("user32.dll")] public static extern bool GetWindowRect(IntPtr hWnd, out RECT rect);
+            [DllImport("user32.dll")] public static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint pid);
+            public struct RECT { public int Left,Top,Right,Bottom; }
+          }
+"@
+          $hwnd = [Win32]::GetForegroundWindow()
+          $rect = New-Object Win32+RECT
+          [Win32]::GetWindowRect($hwnd, [ref]$rect) | Out-Null
+          $w = $rect.Right - $rect.Left
+          $h = $rect.Bottom - $rect.Top
+          $sw = [System.Windows.Forms.Screen]::PrimaryScreen.Bounds.Width
+          $sh = [System.Windows.Forms.Screen]::PrimaryScreen.Bounds.Height
+          Add-Type -AssemblyName System.Windows.Forms
+          ($w -ge $sw -and $h -ge $sh).ToString().ToLower()
+        `;
+        exec(`powershell -command "${script.replace(/\n\s*/g, ' ')}"`, (err, stdout) => {
+          resolve(!err && stdout.trim() === 'true');
+        });
+
+      } else {
+        // Linux: use xdotool to check active window geometry vs screen size
+        exec(
+          `xdotool getactivewindow getwindowgeometry --shell 2>/dev/null`,
+          (err, stdout) => {
+            if (err) { resolve(false); return; }
+            const w = parseInt((stdout.match(/WIDTH=(\d+)/) || [])[1] || '0');
+            const h = parseInt((stdout.match(/HEIGHT=(\d+)/) || [])[1] || '0');
+            const d = screen.getPrimaryDisplay();
+            resolve(w >= d.bounds.width && h >= d.bounds.height);
+          }
+        );
+      }
+    });
   }
 }
 
