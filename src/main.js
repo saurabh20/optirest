@@ -736,6 +736,16 @@ class OptiRest {
         }
       }
 
+      // Check user-defined app exceptions
+      if (!detected) {
+        const userExceptions = (store.get('settings').appExceptions || []).map(e => e.toLowerCase());
+        for (const ex of userExceptions) {
+          if (lower.some(p => p.includes(ex))) {
+            detected = true; reason = `app exception: ${ex}`; break;
+          }
+        }
+      }
+
       // Fullscreen non-electron app = deep focus / unknown fullscreen app
       if (!detected && isFullscreen) {
         detected = true;

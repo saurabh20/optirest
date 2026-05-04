@@ -148,6 +148,41 @@ input[type="color"] {
 }
 .img-card:hover .img-remove { opacity: 1; }
 
+/* App Exceptions */
+.exception-input-row {
+    display: flex; gap: 8px; margin-bottom: 12px;
+}
+.exception-input-row input[type="text"] {
+    flex: 1; padding: 8px 12px;
+    border: 1px solid #dde2ea; border-radius: 6px;
+    font-size: 14px; outline: none; transition: border-color 0.15s;
+}
+.exception-input-row input[type="text"]:focus { border-color: #4CAF50; }
+.add-exception-btn {
+    padding: 8px 14px; background: #4CAF50; color: white;
+    border: none; border-radius: 6px; font-size: 13px;
+    font-weight: 600; cursor: pointer; white-space: nowrap;
+    transition: background 0.15s;
+}
+.add-exception-btn:hover { background: #43a047; }
+
+.exception-tags {
+    display: flex; flex-wrap: wrap; gap: 8px; min-height: 10px;
+}
+.exception-tag {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: #eef6ee; border: 1px solid #c8e6c9;
+    color: #2e7d32; border-radius: 20px;
+    padding: 4px 12px 4px 14px; font-size: 13px; font-weight: 500;
+}
+.exception-tag .tag-remove {
+    background: none; border: none; cursor: pointer;
+    color: #66bb6a; font-size: 14px; padding: 0; line-height: 1;
+    display: flex; align-items: center;
+    transition: color 0.15s;
+}
+.exception-tag .tag-remove:hover { color: #c62828; }
+
 /* Buttons */
 .button-group { display: flex; justify-content: flex-end; gap: 10px; margin-top: 24px; }
 button {

@@ -36,7 +36,9 @@ class Store {
           gradientEnd: '#0d2137',
           gradientAngle: 135,
           // Array of filenames stored in userData/backgrounds/
-          backgroundImages: []
+          backgroundImages: [],
+          // User-defined app exceptions — breaks pause when these run
+          appExceptions: []
         },
         statistics: {
           totalBreaks: 0,

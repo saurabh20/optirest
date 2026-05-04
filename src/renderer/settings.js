@@ -1,4 +1,5 @@
 let currentSettings = {};
+let appExceptions = []; // array of strings
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -73,6 +74,31 @@ async function reloadImages() {
     renderImageGrid();
 }
 
+// ── App Exceptions ────────────────────────────────────────────────────────────
+
+function renderExceptionTags() {
+    const container = document.getElementById('exceptionTags');
+    container.innerHTML = '';
+    appExceptions.forEach((name, idx) => {
+        const tag = document.createElement('span');
+        tag.className = 'exception-tag';
+        tag.innerHTML = `${name}<button class="tag-remove" data-idx="${idx}" title="Remove">✕</button>`;
+        tag.querySelector('.tag-remove').addEventListener('click', (e) => {
+            appExceptions.splice(parseInt(e.currentTarget.dataset.idx), 1);
+            renderExceptionTags();
+        });
+        container.appendChild(tag);
+    });
+}
+
+function addException(name) {
+    const trimmed = name.trim();
+    if (!trimmed) return;
+    if (appExceptions.some(e => e.toLowerCase() === trimmed.toLowerCase())) return; // no dupes
+    appExceptions.push(trimmed);
+    renderExceptionTags();
+}
+
 // ── Load / Save ───────────────────────────────────────────────────────────────
 
 async function loadSettings() {
@@ -103,6 +129,10 @@ async function loadSettings() {
     updateGradientPreview();
 
     await reloadImages();
+
+    // App exceptions
+    appExceptions = Array.isArray(currentSettings.appExceptions) ? [...currentSettings.appExceptions] : [];
+    renderExceptionTags();
 }
 
 function toggleWorkingHoursFields(enabled) {
@@ -126,7 +156,8 @@ async function saveSettings() {
         gradientStart:       document.getElementById('gradientStart').value,
         gradientEnd:         document.getElementById('gradientEnd').value,
         gradientAngle:       parseInt(document.getElementById('gradientAngle').value),
-        backgroundImages:    loadedImages.map(i => i.fname)
+        backgroundImages:    loadedImages.map(i => i.fname),
+        appExceptions:       [...appExceptions]
     };
 
     if (newSettings.workingHoursEnabled) {
@@ -193,6 +224,20 @@ document.addEventListener('DOMContentLoaded', () => {
     // Working hours toggle
     document.getElementById('workingHoursEnabled').addEventListener('change', (e) => {
         toggleWorkingHoursFields(e.target.checked);
+    });
+
+    // App exceptions
+    const exInput = document.getElementById('exceptionInput');
+    document.getElementById('addExceptionBtn').addEventListener('click', () => {
+        addException(exInput.value);
+        exInput.value = '';
+        exInput.focus();
+    });
+    exInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            addException(exInput.value);
+            exInput.value = '';
+        }
     });
 
     document.getElementById('saveBtn').addEventListener('click', saveSettings);

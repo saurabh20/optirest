@@ -122,6 +122,18 @@
             </div>
         </div>
 
+        <!-- App Exceptions -->
+        <div class="settings-group">
+            <h2>App Exceptions</h2>
+            <p class="group-hint">Breaks auto-pause when these apps are running</p>
+            <div class="exception-input-row">
+                <input type="text" id="exceptionInput" placeholder="e.g. Figma, Xcode, Premiere Pro" autocomplete="off">
+                <button type="button" id="addExceptionBtn" class="add-exception-btn">+ Add</button>
+            </div>
+            <div class="exception-tags" id="exceptionTags"></div>
+            <p class="group-hint" style="margin-top:8px">Type the app name as it appears in your system (partial match works)</p>
+        </div>
+
         <div class="button-group">
             <button id="saveBtn" class="primary">Save</button>
             <button id="cancelBtn">Cancel</button>
