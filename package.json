@@ -49,7 +49,20 @@
     },
     "win": {
       "target": "nsis",
-      "icon": "src-obfuscated/assets/icons/app-icon.ico"
+      "icon": "src-obfuscated/assets/icons/app-icon.ico",
+      "publisherName": "Saurabh Mukhekar",
+      "verifyUpdateCodeSignature": false
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": false,
+      "installerIcon": "src-obfuscated/assets/icons/app-icon.ico",
+      "uninstallerIcon": "src-obfuscated/assets/icons/app-icon.ico",
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "OptiRest",
+      "runAfterFinish": true
     },
     "linux": {
       "target": "AppImage",

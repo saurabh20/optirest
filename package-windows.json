@@ -5,9 +5,12 @@
     "output": "dist/windows"
   },
   "files": [
-    "src/**/*",
+    "src-obfuscated/**/*",
     "package.json"
   ],
+  "extraMetadata": {
+    "main": "src-obfuscated/main.js"
+  },
   "win": {
     "icon": "src/assets/icons/app-icon.ico",
     "target": [
@@ -22,7 +25,7 @@
   "nsis": {
     "oneClick": false,
     "perMachine": false,
-    "allowToChangeInstallationDirectory": true,
+    "allowToChangeInstallationDirectory": false,
     "installerIcon": "src/assets/icons/app-icon.ico",
     "uninstallerIcon": "src/assets/icons/app-icon.ico",
     "installerHeaderIcon": "src/assets/icons/app-icon.ico",
