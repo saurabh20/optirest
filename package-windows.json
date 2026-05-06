@@ -9,7 +9,7 @@
     "package.json"
   ],
   "win": {
-    "icon": "src/assets/icons/app-icon.ico",
+    "icon": "build/app-icon.ico",
     "target": [
       {
         "target": "nsis",
@@ -23,9 +23,9 @@
     "oneClick": false,
     "perMachine": false,
     "allowToChangeInstallationDirectory": false,
-    "installerIcon": "src/assets/icons/app-icon.ico",
-    "uninstallerIcon": "src/assets/icons/app-icon.ico",
-    "installerHeaderIcon": "src/assets/icons/app-icon.ico",
+    "installerIcon": "build/app-icon.ico",
+    "uninstallerIcon": "build/app-icon.ico",
+    "installerHeaderIcon": "build/app-icon.ico",
     "createDesktopShortcut": true,
     "createStartMenuShortcut": true,
     "shortcutName": "OptiRest",

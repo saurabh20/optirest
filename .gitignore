@@ -5,3 +5,4 @@ src-obfuscated/
 .DS_Store
 Thumbs.db
 build/entitlements.mac.plist
+build/*.plist
