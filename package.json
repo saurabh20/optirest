@@ -9,7 +9,7 @@
     "dist": "electron-builder --publish=never",
     "obfuscate": "node scripts/obfuscate.mjs",
     "dist-mac": "npm run obfuscate && electron-builder --mac",
-    "dist-win": "npm run obfuscate && electron-builder --win",
+    "dist-win": "electron-builder --win --config package-windows.json",
     "dist-linux": "npm run obfuscate && electron-builder --linux"
   },
   "keywords": [

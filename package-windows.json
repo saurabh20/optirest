@@ -5,12 +5,9 @@
     "output": "dist/windows"
   },
   "files": [
-    "src-obfuscated/**/*",
+    "src/**/*",
     "package.json"
   ],
-  "extraMetadata": {
-    "main": "src-obfuscated/main.js"
-  },
   "win": {
     "icon": "src/assets/icons/app-icon.ico",
     "target": [
