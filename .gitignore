@@ -6,3 +6,6 @@ src-obfuscated/
 Thumbs.db
 build/entitlements.mac.plist
 build/*.plist
+CLAUDE.md
+CLAUDE.original.md
+.claude/
