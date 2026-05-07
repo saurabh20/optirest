@@ -320,8 +320,8 @@ class OptiRest {
       if (settings.soundEnabled) this.playSound();
 
       const stats = store.get('statistics');
-      stats.completedBreaks++;
-      stats.totalBreaks++;
+      stats.completedBreaks = (stats.completedBreaks || 0) + 1;
+      stats.totalBreaks     = (stats.totalBreaks     || 0) + 1;
       store.set('statistics', stats);
       store.incrementDailyStat('completed');
 
@@ -580,8 +580,8 @@ class OptiRest {
     this.closeAllCountdownWindows();
     missedBreaks++;
     const stats = store.get('statistics');
-    stats.skippedBreaks++;
-    stats.totalBreaks++;
+    stats.skippedBreaks = (stats.skippedBreaks || 0) + 1;
+    stats.totalBreaks   = (stats.totalBreaks   || 0) + 1;
     store.set('statistics', stats);
     store.incrementDailyStat('skipped');
     this.updateTrayIcon();

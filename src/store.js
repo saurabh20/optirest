@@ -7,6 +7,7 @@ class Store {
     const userDataPath = app.getPath('userData');
     this.path = path.join(userDataPath, 'config.json');
     this.data = this.loadData();
+    this.migrateStatistics();
   }
 
   loadData() {
@@ -54,6 +55,16 @@ class Store {
       this.save();
       return defaults;
     }
+  }
+
+  // Migrate missing/NaN stats fields from old installs
+  migrateStatistics() {
+    const s = this.data.statistics;
+    if (!s) return;
+    ['totalBreaks', 'completedBreaks', 'skippedBreaks'].forEach(k => {
+      if (!s[k] || isNaN(s[k])) s[k] = 0;
+    });
+    this.save();
   }
 
   get(key) {
