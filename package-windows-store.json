@@ -9,7 +9,7 @@
     "package.json"
   ],
   "win": {
-    "icon": "src/assets/icons/app-icon.ico",
+    "icon": "build/app-icon.ico",
     "target": [
       {
         "target": "appx",
@@ -23,8 +23,8 @@
     "applicationId": "OptiRest",
     "backgroundColor": "#0a0e27",
     "displayName": "OptiRest",
-    "identityName": "com.blogsaays.optirest",
-    "publisher": "CN=Saurabh Mukhekar",
+    "identityName": "BlogSaays.OptiRest",
+    "publisher": "CN=15984F30-F324-4107-8F4B-5533AB5332A7",
     "publisherDisplayName": "Saurabh Mukhekar"
   }
 }
