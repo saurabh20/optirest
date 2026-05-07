@@ -189,10 +189,10 @@ When the timer reaches 0:
 
 ### Dismissing a break early
 
-| Action | Keyboard | Effect |
-|--------|----------|--------|
-| **Postpone** | `Cmd/Ctrl + Shift + P` | Delays break by your postpone duration (default 5 min), then fires again |
-| **Skip** | `Cmd/Ctrl + Shift + K` | Cancels break, increments skipped count. Tray icon turns red after 3 consecutive skips |
+| Action | macOS | Windows / Linux | Effect |
+|--------|-------|-----------------|--------|
+| **Postpone** | `Ctrl + Shift + P` | `Ctrl + Alt + P` | Delays break by your postpone duration (default 5 min), then fires again |
+| **Skip** | `Ctrl + Shift + K` | `Ctrl + Alt + K` | Cancels break, increments skipped count. Tray icon turns red after 3 consecutive skips |
 
 ---
 
@@ -268,13 +268,13 @@ Time-ago label: "Just now", "12 minutes ago", "3 hours ago", etc.
 
 ## Keyboard Shortcuts
 
-| Shortcut | Action | Active when |
-|----------|--------|-------------|
-| `Cmd/Ctrl + Shift + B` | Take a break immediately | Always |
-| `Cmd/Ctrl + Shift + P` | Postpone current break | During a break |
-| `Cmd/Ctrl + Shift + K` | Skip current break | During a break |
+| Action | macOS | Windows / Linux | Active when |
+|--------|-------|-----------------|-------------|
+| Take a break immediately | `Ctrl + Shift + B` | `Ctrl + Shift + B` | Always |
+| Postpone current break | `Ctrl + Shift + P` | `Ctrl + Alt + P` | During a break |
+| Skip current break | `Ctrl + Shift + K` | `Ctrl + Alt + K` | During a break |
 
-> **Why K not S for skip?** `Cmd+Shift+S` is a system screenshot shortcut on macOS. `K` avoids the conflict.
+> **Why different on Windows?** `Ctrl + Shift + P` and `Ctrl + Shift + K` are claimed globally by apps like VS Code on Windows, causing silent conflicts. `Ctrl + Alt + P/K` avoids this.
 
 ---
 
