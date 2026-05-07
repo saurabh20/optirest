@@ -29,11 +29,12 @@ document.addEventListener('DOMContentLoaded', () => {
   window.electronAPI.on('background-config', (config) => applyBackground(config));
 
   // Show platform-correct shortcut hints
+  // Mac: Ctrl+Shift+P/K  |  Windows/Linux: Ctrl+Alt+P/K
   const isMac = navigator.platform.toUpperCase().includes('MAC');
   const postponeHint = document.getElementById('hintPostpone');
   const skipHint     = document.getElementById('hintSkip');
-  if (postponeHint) postponeHint.textContent = isMac ? '⌘+Shift+P' : 'Ctrl+Alt+P';
-  if (skipHint)     skipHint.textContent     = isMac ? '⌘+Shift+K' : 'Ctrl+Alt+K';
+  if (postponeHint) postponeHint.textContent = isMac ? 'Ctrl+Shift+P' : 'Ctrl+Alt+P';
+  if (skipHint)     skipHint.textContent     = isMac ? 'Ctrl+Shift+K' : 'Ctrl+Alt+K';
 });
 
 // ── Background ────────────────────────────────────────────────────────────────
