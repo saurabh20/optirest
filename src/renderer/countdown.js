@@ -27,6 +27,13 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   window.electronAPI.on('start-countdown',  (data)   => startCountdown(data));
   window.electronAPI.on('background-config', (config) => applyBackground(config));
+
+  // Show platform-correct shortcut hints
+  const isMac = navigator.platform.toUpperCase().includes('MAC');
+  const postponeHint = document.getElementById('hintPostpone');
+  const skipHint     = document.getElementById('hintSkip');
+  if (postponeHint) postponeHint.textContent = isMac ? '⌘+Shift+P' : 'Ctrl+Alt+P';
+  if (skipHint)     skipHint.textContent     = isMac ? '⌘+Shift+K' : 'Ctrl+Alt+K';
 });
 
 // ── Background ────────────────────────────────────────────────────────────────
