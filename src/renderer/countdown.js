@@ -254,17 +254,20 @@ function stopBreathingAnimation() {
 // ── Keyboard shortcuts ────────────────────────────────────────────────────────
 
 document.addEventListener('keydown', (e) => {
-  if ((e.ctrlKey || e.metaKey) && e.shiftKey) {
-    if (e.key === 'P' || e.key === 'p') {
-      clearInterval(countdownInterval);
-      stopBreathingAnimation();
-      stopImageRotator();
-      window.electronAPI.send('postpone-break');
-    } else if (e.key === 'K' || e.key === 'k') {
-      clearInterval(countdownInterval);
-      stopBreathingAnimation();
-      stopImageRotator();
-      window.electronAPI.send('skip-break');
-    }
+  const ctrl = e.ctrlKey || e.metaKey;
+  const key  = e.key.toUpperCase();
+
+  // Ctrl+Shift+P or Ctrl+Alt+P → postpone
+  const isPostpone = ctrl && (e.shiftKey || e.altKey) && key === 'P';
+  // Ctrl+Shift+K or Ctrl+Alt+K → skip
+  const isSkip     = ctrl && (e.shiftKey || e.altKey) && key === 'K';
+
+  if (isPostpone || isSkip) {
+    e.preventDefault();
+    e.stopPropagation();
+    clearInterval(countdownInterval);
+    stopBreathingAnimation();
+    stopImageRotator();
+    window.electronAPI.send(isPostpone ? 'postpone-break' : 'skip-break');
   }
 });

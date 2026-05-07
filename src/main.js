@@ -464,13 +464,30 @@ class OptiRest {
   // ── Shortcuts ─────────────────────────────────────────────────────────────
 
   registerShortcuts() {
-    globalShortcut.register('CommandOrControl+Shift+P', () => {
+    // Primary shortcuts
+    const regP = globalShortcut.register('CommandOrControl+Shift+P', () => {
       if (isBreakActive) this.postponeBreak();
     });
-    globalShortcut.register('CommandOrControl+Shift+K', () => {
+    const regK = globalShortcut.register('CommandOrControl+Shift+K', () => {
       if (isBreakActive) this.skipBreak();
     });
-    globalShortcut.register('CommandOrControl+Shift+B', () => this.startBreak());
+    const regB = globalShortcut.register('CommandOrControl+Shift+B', () => this.startBreak());
+
+    if (!regP) console.warn('[OptiRest] Ctrl+Shift+P failed to register — likely claimed by another app (e.g. VS Code). Trying Alt fallback.');
+    if (!regK) console.warn('[OptiRest] Ctrl+Shift+K failed to register — likely claimed by another app (e.g. VS Code). Trying Alt fallback.');
+    if (!regB) console.warn('[OptiRest] Ctrl+Shift+B failed to register.');
+
+    // Fallback shortcuts using Alt instead of Shift — avoids VS Code / system conflicts
+    if (!regP) {
+      globalShortcut.register('CommandOrControl+Alt+P', () => {
+        if (isBreakActive) this.postponeBreak();
+      });
+    }
+    if (!regK) {
+      globalShortcut.register('CommandOrControl+Alt+K', () => {
+        if (isBreakActive) this.skipBreak();
+      });
+    }
   }
 
   // ── Break lifecycle ───────────────────────────────────────────────────────
@@ -495,10 +512,13 @@ class OptiRest {
 
     displays.forEach((display, index) => {
       const { bounds } = display;
+      const isWin = process.platform === 'win32';
       const win = new BrowserWindow({
         x: bounds.x, y: bounds.y,
         width: bounds.width, height: bounds.height,
-        fullscreen: true, alwaysOnTop: true,
+        // On Windows: don't use fullscreen:true — it can prevent keyboard focus in the renderer.
+        // Instead use maximized + kiosk-like settings so keydown events reach the DOM.
+        fullscreen: !isWin, alwaysOnTop: true,
         frame: false, transparent: true,
         skipTaskbar: true, focusable: true, show: false,
         webPreferences: {
@@ -512,13 +532,36 @@ class OptiRest {
 
       win.once('ready-to-show', () => {
         win.show();
+        if (isWin) {
+          // Windows: set alwaysOnTop at 'screen-saver' level — above taskbar, system tray, etc.
+          win.setAlwaysOnTop(true, 'screen-saver');
+          win.maximize();
+          win.moveTop();
+        }
         win.focus();
         win.webContents.focus();
+        // Windows: retry focus after short delay — OS focus-stealing prevention can grab it back
+        if (isWin) {
+          setTimeout(() => {
+            if (!win.isDestroyed()) {
+              win.focus();
+              win.webContents.focus();
+            }
+          }, 150);
+        }
         win.webContents.send('start-countdown', {
           duration: settings.breakDuration,
           message: settings.reminderMessage
         });
         win.webContents.send('background-config', bgConfig);
+      });
+
+      // Block Alt+F4 / Cmd+W — route through skipBreak so stats are recorded
+      win.on('close', (e) => {
+        if (isBreakActive) {
+          e.preventDefault();
+          this.skipBreak();
+        }
       });
 
       win.on('closed', () => {
