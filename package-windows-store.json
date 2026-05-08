@@ -16,7 +16,7 @@
         "arch": ["x64"]
       }
     ],
-    "publisherName": "Saurabh Mukhekar",
+    "publisherName": "BlogSaays",
     "verifyUpdateCodeSignature": false
   },
   "appx": {
@@ -25,6 +25,6 @@
     "displayName": "OptiRest",
     "identityName": "BlogSaays.OptiRest",
     "publisher": "CN=15984F30-F324-4107-8F4B-5533AB5332A7",
-    "publisherDisplayName": "Saurabh Mukhekar"
+    "publisherDisplayName": "BlogSaays"
   }
 }
