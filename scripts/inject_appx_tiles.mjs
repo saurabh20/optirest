@@ -31,8 +31,11 @@ console.log(`\nPatching: ${appxPath}`);
 if (fs.existsSync(WORK_DIR)) fs.rmSync(WORK_DIR, { recursive: true });
 fs.mkdirSync(WORK_DIR, { recursive: true });
 
-// Use PowerShell Expand-Archive (available on all modern Windows)
-execSync(`powershell -Command "Expand-Archive -Force '${appxPath}' '${WORK_DIR}'"`, { stdio: 'inherit' });
+// Expand-Archive only accepts .zip — rename to .zip, expand, rename back
+const zipPath = appxPath.replace('.appx', '.zip');
+fs.copyFileSync(appxPath, zipPath);
+execSync(`powershell -Command "Expand-Archive -Force '${zipPath}' '${WORK_DIR}'"`, { stdio: 'inherit' });
+fs.unlinkSync(zipPath);
 console.log('  ✓ Unpacked');
 
 // ── find and replace tile images ─────────────────────────────────────────────
@@ -75,16 +78,18 @@ function walk(dir) {
 walk(WORK_DIR);
 
 // ── repack ───────────────────────────────────────────────────────────────────
-const patchedPath = appxPath.replace('.appx', '-patched.appx');
-if (fs.existsSync(patchedPath)) fs.unlinkSync(patchedPath);
+// Compress-Archive only produces .zip — compress to .zip then rename to .appx
+const repackedZip = appxPath.replace('.appx', '-repacked.zip');
+if (fs.existsSync(repackedZip)) fs.unlinkSync(repackedZip);
 
 execSync(
-  `powershell -Command "Compress-Archive -Force -Path '${WORK_DIR}\\*' -DestinationPath '${patchedPath}'"`,
+  `powershell -Command "Compress-Archive -Force -Path '${WORK_DIR}\\*' -DestinationPath '${repackedZip}'"`,
   { stdio: 'inherit' }
 );
 
-// Replace original with patched
-fs.renameSync(patchedPath, appxPath);
+// Replace original .appx with repacked zip renamed to .appx
+fs.unlinkSync(appxPath);
+fs.renameSync(repackedZip, appxPath);
 fs.rmSync(WORK_DIR, { recursive: true });
 
 console.log(`\n✅ Done — patched APPX: ${appxPath}`);
