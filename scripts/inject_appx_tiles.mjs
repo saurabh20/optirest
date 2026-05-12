@@ -12,30 +12,47 @@
 import fs   from 'fs';
 import path from 'path';
 import { execSync } from 'child_process';
-import { createRequire } from 'module';
 
-const require = createRequire(import.meta.url);
+// ── locate makeappx.exe ───────────────────────────────────────────────────────
+function findMakeAppx() {
+  const kitsRoot = 'C:\\Program Files (x86)\\Windows Kits\\10\\bin';
+  if (!fs.existsSync(kitsRoot)) return null;
+  // Find highest version folder
+  const versions = fs.readdirSync(kitsRoot)
+    .filter(d => d.startsWith('10.'))
+    .sort()
+    .reverse();
+  for (const v of versions) {
+    const p = path.join(kitsRoot, v, 'x64', 'makeappx.exe');
+    if (fs.existsSync(p)) return p;
+  }
+  return null;
+}
+
+const makeappx = findMakeAppx();
+if (!makeappx) {
+  console.error('makeappx.exe not found. Install Windows SDK: https://developer.microsoft.com/windows/downloads/windows-sdk/');
+  process.exit(1);
+}
+console.log(`Using makeappx: ${makeappx}`);
 
 // ── locate APPX ──────────────────────────────────────────────────────────────
-const APPX_DIR   = 'dist/windows-store';
-const TILES_DIR  = 'build/appx-tiles';
-const WORK_DIR   = 'dist/windows-store/_appx_work';
+const APPX_DIR  = 'dist/windows-store';
+const TILES_DIR = 'build/appx-tiles';
+const WORK_DIR  = 'dist/windows-store/_appx_work';
 
 const appxFile = fs.readdirSync(APPX_DIR).find(f => f.endsWith('.appx'));
 if (!appxFile) { console.error('No .appx found in dist/windows-store/'); process.exit(1); }
 
-const appxPath = path.join(APPX_DIR, appxFile);
+const appxPath = path.resolve(path.join(APPX_DIR, appxFile));
 console.log(`\nPatching: ${appxPath}`);
 
-// ── unpack ───────────────────────────────────────────────────────────────────
+// ── unpack via makeappx ───────────────────────────────────────────────────────
 if (fs.existsSync(WORK_DIR)) fs.rmSync(WORK_DIR, { recursive: true });
 fs.mkdirSync(WORK_DIR, { recursive: true });
 
-// Expand-Archive only accepts .zip — rename to .zip, expand, rename back
-const zipPath = appxPath.replace('.appx', '.zip');
-fs.copyFileSync(appxPath, zipPath);
-execSync(`powershell -Command "Expand-Archive -Force '${zipPath}' '${WORK_DIR}'"`, { stdio: 'inherit' });
-fs.unlinkSync(zipPath);
+const workAbs = path.resolve(WORK_DIR);
+execSync(`"${makeappx}" unpack /p "${appxPath}" /d "${workAbs}" /nv`, { stdio: 'inherit' });
 console.log('  ✓ Unpacked');
 
 // ── find and replace tile images ─────────────────────────────────────────────
@@ -78,18 +95,14 @@ function walk(dir) {
 walk(WORK_DIR);
 
 // ── repack ───────────────────────────────────────────────────────────────────
-// Compress-Archive only produces .zip — compress to .zip then rename to .appx
-const repackedZip = appxPath.replace('.appx', '-repacked.zip');
-if (fs.existsSync(repackedZip)) fs.unlinkSync(repackedZip);
+// Repack via makeappx — produces valid APPX format
+const patchedPath = appxPath.replace('.appx', '-patched.appx');
+if (fs.existsSync(patchedPath)) fs.unlinkSync(patchedPath);
 
-execSync(
-  `powershell -Command "Compress-Archive -Force -Path '${WORK_DIR}\\*' -DestinationPath '${repackedZip}'"`,
-  { stdio: 'inherit' }
-);
+execSync(`"${makeappx}" pack /d "${workAbs}" /p "${path.resolve(patchedPath)}" /nv`, { stdio: 'inherit' });
 
-// Replace original .appx with repacked zip renamed to .appx
 fs.unlinkSync(appxPath);
-fs.renameSync(repackedZip, appxPath);
+fs.renameSync(patchedPath, appxPath);
 fs.rmSync(WORK_DIR, { recursive: true });
 
 console.log(`\n✅ Done — patched APPX: ${appxPath}`);
