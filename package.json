@@ -10,6 +10,7 @@
     "obfuscate": "node scripts/obfuscate.mjs",
     "dist-mac": "npm run obfuscate && electron-builder --mac",
     "dist-win": "electron-builder --win --config package-windows.json",
+    "dist-store": "npm run obfuscate && electron-builder --config package-windows-store.json && node scripts/inject_appx_tiles.mjs",
     "dist-linux": "npm run obfuscate && electron-builder --linux"
   },
   "keywords": [
