@@ -25,6 +25,12 @@
     "displayName": "OptiRest",
     "identityName": "BlogSaays.OptiRest",
     "publisher": "CN=15984F30-F324-4107-8F4B-5533AB5332A7",
-    "publisherDisplayName": "Saurabh Mukhekar"
+    "publisherDisplayName": "Saurabh Mukhekar",
+    "storeLogo": "build/appx-tiles/StoreLogo.png",
+    "square44x44Logo": "build/appx-tiles/Square44x44Logo.png",
+    "square71x71Logo": "build/appx-tiles/Square71x71Logo.png",
+    "square150x150Logo": "build/appx-tiles/Square150x150Logo.png",
+    "square310x310Logo": "build/appx-tiles/Square310x310Logo.png",
+    "wide310x150Logo": "build/appx-tiles/Wide310x150Logo.png"
   }
 }
